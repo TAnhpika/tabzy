@@ -17,7 +17,7 @@
         <ul id="tabs">
             <!-- Tabs -->
             <li>
-                    <a href="#tab1">Tab 1</a>
+                <a href="#tab1">Tab 1</a>
             </li>
             <li>
                 <a href="#tab2">Tab 2</a>
@@ -36,6 +36,9 @@
         <script>
             const tabs = new Tabzy("#tabs");
 
+            const tab2 = document.querySelector('a[href="#tab2"]')
+            console.log(tab2);
+            
             // tabs.switch("#tab3")
             // tabs.destroy()
         </script>
