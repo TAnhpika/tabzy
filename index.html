@@ -55,8 +55,11 @@
         <script>
             const tabs = new Tabzy("#tabs", {
                 remember: true,
-            });
-            // // vấn đề: k lưu hash 2 tab đc
+                onChange: () => {
+
+                }
+            })
+
             const tabs2 = new Tabzy("#tabs2", {
                 remember: true,
             });
