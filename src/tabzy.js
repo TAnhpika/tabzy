@@ -73,8 +73,8 @@ Tabzy.prototype._init = function () {
 
 Tabzy.prototype._tryActivateTab = function (tab) {
     if (this.currentTab !== tab) {
-        this._activateTab(tab);
         this.currentTab = tab;
+        this._activateTab(tab);
     }
 };
 
