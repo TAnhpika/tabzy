@@ -6,50 +6,97 @@
         <title>Tabzy</title>
         <link rel="stylesheet" href="./src/tabzy.css" />
         <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
             .tabzy--active a {
                 color: pink;
                 font-weight: 600;
             }
+
+            .demo1 {
+                background-color: #087379;
+            }
+            .tabs1 {
+                display: flex;
+                list-style: none;
+            }
+
+            .tabs1 a {
+                display: inline-block;
+                text-decoration: none;
+                padding: 10px 20px;
+                background-color: #f7e9e9;
+                border-bottom: 1px solid #fff;
+
+            }
+
+            .tabs1 .tabzy--active a {
+                background-color: #4a7c9c;
+                border-color: pink;
+            }
+
+            .demo1 .panels {
+                background-color: #4a7c9c;
+            }
+
+            .demo2 {
+                display: flex;
+                margin-top: 100px;
+            }
+            
+            .demo2 .panels {
+                padding-left: 30px;
+            }
         </style>
     </head>
     <body>
-        <!-- Container -->
-        <ul id="tabs">
+        <div class="demo1">
+            <ul id="tabs" class="tabs1">
+                <!-- Tabs -->
+                <li>
+                    <a href="#tab1">Tab 1</a>
+                </li>
+                <li>
+                    <a href="#tab2">Tab 2</a>
+                </li>
+                <li>
+                    <a href="#tab3">Tab 3</a>
+                </li>
+            </ul>
+
+            <!-- Panels -->
+            <div class="panels">
+                <div id="tab1">Tab1 content</div>
+                <div id="tab2">Tab2 content</div>
+                <div id="tab3">Tab3 content</div>
+            </div>
+        </div>
+
+        <div class="demo2">
             <!-- Tabs -->
-            <li>
-                <a href="#tab1">Tab 1</a>
-            </li>
-            <li>
-                <a href="#tab2">Tab 2</a>
-            </li>
-            <li>
-                <a href="#tab3">Tab 3</a>
-            </li>
-        </ul>
+            <ul id="tabs2">
+                <li>
+                    <a href="#tabA">Tab A</a>
+                </li>
+                <li>
+                    <a href="#tabB">Tab B</a>
+                </li>
+                <li>
+                    <a href="#tabC">Tab C</a>
+                </li>
+            </ul>
 
-        <!-- Panels -->
-        <div id="tab1">Tab1 content</div>
-        <div id="tab2">Tab2 content</div>
-        <div id="tab3">Tab3 content</div>
-
-        <!-- Tab 2 -->
-        <ul id="tabs2">
-            <!-- Tabs -->
-            <li>
-                <a href="#tabA">Tab A</a>
-            </li>
-            <li>
-                <a href="#tabB">Tab B</a>
-            </li>
-            <li>
-                <a href="#tabC">Tab C</a>
-            </li>
-        </ul>
-
-        <!-- Panels -->
-        <div id="tabA">Tab A content</div>
-        <div id="tabB">Tab B content</div>
-        <div id="tabC">Tab C content</div>
+            <!-- Panels -->
+            <div class="panels">
+                <div id="tabA">Tab A content</div>
+                <div id="tabB">Tab B content</div>
+                <div id="tabC">Tab C content</div>
+            </div>
+        </div>
 
         <script src="./src/tabzy.js"></script>
         <script>
@@ -58,8 +105,8 @@
                 onChange: (data) => {
                     // data.tab data.panel
                     console.log(data);
-                }
-            })
+                },
+            });
 
             const tabs2 = new Tabzy("#tabs2", {
                 remember: true,

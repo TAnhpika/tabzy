@@ -61,7 +61,7 @@ Tabzy.prototype._init = function () {
         this.tabs[0];
 
     this.currentTab = tab;
-    this._activateTab(tab, false);
+    this._activateTab(tab, false, false);
 
     this.tabs.forEach((tab) => {
         tab.onclick = (event) => {
@@ -78,7 +78,7 @@ Tabzy.prototype._tryActivateTab = function (tab) {
     }
 };
 
-Tabzy.prototype._activateTab = function (tab, triggerOnChange = true) {
+Tabzy.prototype._activateTab = function (tab, triggerOnChange = true, updateURL = this.opt.remember) {
     this.tabs.forEach((tab) => {
         tab.closest("li").classList.remove(this.opt.activeClassName);
     });
@@ -91,7 +91,7 @@ Tabzy.prototype._activateTab = function (tab, triggerOnChange = true) {
     panelActive.hidden = false;
 
     // thêm hash vào url
-    if (this.opt.remember) {
+    if (updateURL) {
         const params = new URLSearchParams(location.search);
 
         params.set(
