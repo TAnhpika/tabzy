@@ -34,23 +34,28 @@ function Tabzy(selector, options = {}) {
         options,
     );
 
-    this.paramKey = selector.replace(/[^a-zA-Z0-9]/g, '')
+    this.paramKey = selector.replace(/[^a-zA-Z0-9]/g, "");
     this._originHTML = this.container.innerHTML;
 
     this._init();
 }
 
 Tabzy.prototype._init = function () {
-    const params = new URLSearchParams(location.search)
-    const tabSelector = params.get(this.paramKey)
-    
+    const params = new URLSearchParams(location.search);
+    const tabSelector = params.get(this.paramKey);
+
     const tab =
         (this.opt.remember &&
             tabSelector &&
-            this.tabs.find((tab) => tab.getAttribute("href").replace(/[^a-zA-Z0-9]/g, '') === tabSelector)) ||
+            this.tabs.find(
+                (tab) =>
+                    tab.getAttribute("href").replace(/[^a-zA-Z0-9]/g, "") ===
+                    tabSelector,
+            )) ||
         this.tabs[0];
 
-    this._activateTab(tab);
+    this.currentTab = tab;
+    this._activateTab(tab, false);
 
     this.tabs.forEach((tab) => {
         tab.onclick = (event) => this._handleTabClick(event, tab);
@@ -59,10 +64,18 @@ Tabzy.prototype._init = function () {
 
 Tabzy.prototype._handleTabClick = function (event, tab) {
     event.preventDefault(); // k hiện trên url && k nhảy đến id
-    this._activateTab(tab);
+
+    this._tryActivateTab(tab);
 };
 
-Tabzy.prototype._activateTab = function (tab) {
+Tabzy.prototype._tryActivateTab = function (tab) {
+    if (this.currentTab !== tab) {
+        this._activateTab(tab);
+        this.currentTab = tab;
+    }
+};
+
+Tabzy.prototype._activateTab = function (tab, triggerOnChange = true) {
     this.tabs.forEach((tab) => {
         tab.closest("li").classList.remove("tabzy--active");
     });
@@ -76,17 +89,19 @@ Tabzy.prototype._activateTab = function (tab) {
 
     // thêm hash vào url
     if (this.opt.remember) {
-        const params = new URLSearchParams(location.search)
-        const paramValue = tab.getAttribute('href').replace(/[^a-zA-Z0-9]/g, '')
-        params.set(this.paramKey, paramValue) // tự động encode
+        const params = new URLSearchParams(location.search);
+        const paramValue = tab
+            .getAttribute("href")
+            .replace(/[^a-zA-Z0-9]/g, "");
+        params.set(this.paramKey, paramValue); // tự động encode
         history.replaceState(null, null, `?${params}`);
     }
 
-    if (typeof this.opt.onChange === 'function') {
+    if (triggerOnChange && typeof this.opt.onChange === "function") {
         this.opt.onChange({
             tab,
             panel: panelActive,
-        })
+        });
     }
 };
 
@@ -114,7 +129,7 @@ Tabzy.prototype.switch = function (input) {
         return;
     }
 
-    this._activateTab(tabToActivate);
+    this._tryActivateTab(tabToActivate);
 };
 
 Tabzy.prototype.destroy = function () {
@@ -123,4 +138,5 @@ Tabzy.prototype.destroy = function () {
     this.container = null;
     this.tabs = null;
     this.panels = null;
+    this.currentTab = null;
 };
