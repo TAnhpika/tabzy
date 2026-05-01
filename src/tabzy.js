@@ -11,7 +11,29 @@ function Tabzy(selector, options = {}) {
         return;
     }
 
-    this.panels = this.tabs
+    this.panels = this.getPanels();
+
+    // check thiếu panel
+    if (this.tabs.length !== this.panels.length) return;
+
+    this.opt = Object.assign(
+        {
+            activeClassName: "tabzy--active",
+            remember: false,
+            onChange: null,
+        },
+        options,
+    );
+
+    this._cleanRegex = /[^a-zA-Z0-9]/g;
+    this.paramKey = selector.replace(this._cleanRegex, "");
+    this._originHTML = this.container.innerHTML;
+
+    this._init();
+}
+
+Tabzy.prototype.getPanels = function () {
+    return this.tabs
         .map((tab) => {
             const panel = document.querySelector(tab.getAttribute("href"));
             if (!panel) {
@@ -22,23 +44,7 @@ function Tabzy(selector, options = {}) {
             return panel;
         })
         .filter(Boolean); // bỏ qua falsy - null
-
-    // check thiếu panel
-    if (this.tabs.length !== this.panels.length) return;
-
-    this.opt = Object.assign(
-        {
-            remember: false,
-            onChange: null,
-        },
-        options,
-    );
-
-    this.paramKey = selector.replace(/[^a-zA-Z0-9]/g, "");
-    this._originHTML = this.container.innerHTML;
-
-    this._init();
-}
+};
 
 Tabzy.prototype._init = function () {
     const params = new URLSearchParams(location.search);
@@ -49,7 +55,7 @@ Tabzy.prototype._init = function () {
             tabSelector &&
             this.tabs.find(
                 (tab) =>
-                    tab.getAttribute("href").replace(/[^a-zA-Z0-9]/g, "") ===
+                    tab.getAttribute("href").replace(this._cleanRegex, "") ===
                     tabSelector,
             )) ||
         this.tabs[0];
@@ -58,14 +64,11 @@ Tabzy.prototype._init = function () {
     this._activateTab(tab, false);
 
     this.tabs.forEach((tab) => {
-        tab.onclick = (event) => this._handleTabClick(event, tab);
+        tab.onclick = (event) => {
+            event.preventDefault(); // k hiện trên url && k nhảy đến id
+            this._tryActivateTab(tab);
+        };
     });
-};
-
-Tabzy.prototype._handleTabClick = function (event, tab) {
-    event.preventDefault(); // k hiện trên url && k nhảy đến id
-
-    this._tryActivateTab(tab);
 };
 
 Tabzy.prototype._tryActivateTab = function (tab) {
@@ -77,10 +80,10 @@ Tabzy.prototype._tryActivateTab = function (tab) {
 
 Tabzy.prototype._activateTab = function (tab, triggerOnChange = true) {
     this.tabs.forEach((tab) => {
-        tab.closest("li").classList.remove("tabzy--active");
+        tab.closest("li").classList.remove(this.opt.activeClassName);
     });
 
-    tab.closest("li").classList.add("tabzy--active");
+    tab.closest("li").classList.add(this.opt.activeClassName);
 
     this.panels.forEach((panel) => (panel.hidden = true));
 
@@ -90,10 +93,11 @@ Tabzy.prototype._activateTab = function (tab, triggerOnChange = true) {
     // thêm hash vào url
     if (this.opt.remember) {
         const params = new URLSearchParams(location.search);
-        const paramValue = tab
-            .getAttribute("href")
-            .replace(/[^a-zA-Z0-9]/g, "");
-        params.set(this.paramKey, paramValue); // tự động encode
+
+        params.set(
+            this.paramKey,
+            tab.getAttribute("href").replace(this._cleanRegex, ""),
+        ); // tự động encode
         history.replaceState(null, null, `?${params}`);
     }
 
@@ -107,24 +111,14 @@ Tabzy.prototype._activateTab = function (tab, triggerOnChange = true) {
 
 // tabElement or panelSelector
 Tabzy.prototype.switch = function (input) {
-    let tabToActivate = null;
+    const tab =
+        typeof input === "string"
+            ? this.tabs.find((tab) => tab.getAttribute("href") === input)
+            : this.tabs.includes(input)
+              ? input
+              : null;
 
-    if (typeof input === "string") {
-        // "#tab3"
-        tabToActivate = this.tabs.find(
-            (tab) => tab.getAttribute("href") === input,
-        );
-
-        if (!tabToActivate) {
-            console.error(`Tabzy: No panel found with ID '${input}'`);
-            return;
-        }
-    } else if (this.tabs.includes(input)) {
-        // tab3
-        tabToActivate = input;
-    }
-
-    if (!tabToActivate) {
+    if (!tab) {
         console.error(`Tabzy: Invalid input '${input}'`);
         return;
     }
